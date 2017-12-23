@@ -89,7 +89,9 @@ with cms_figure.TDRStyle():
     canvas.Draw()
 ```
 
-![Default](images/default.png)
+<p align="center">
+  <img width="350" height="350" src="images/default.png">
+</p>
 
 Let's add some additional writing to make it more interesting:
 
@@ -103,11 +105,13 @@ with cms_figure.TDRStyle():
     canvas.Draw()
 ```
 
-![DefaultWithExtraText](images/default_extra.png)
+<p align="center">
+  <img width="350" height="350" src="images/default_extra.png">
+</p>
 
 The other common positions are:
 
-* `center`,
+* center,
 
   ```python
   with cms_figure.TDRStyle():
@@ -124,9 +128,11 @@ The other common positions are:
       canvas.Draw()
   ```
   
-  ![CenterWithExtraText](images/center_extra.png)
+  <p align="center">
+    <img width="350" height="350" src="images/center_extra.png">
+  </p>
 
-* `right`,
+* right,
 
   ```python
   with cms_figure.TDRStyle():
@@ -142,9 +148,11 @@ The other common positions are:
       canvas.Draw()
   ```
   
-  ![RightWithExtraText](images/right_extra.png)
+  <p align="center">
+    <img width="350" height="350" src="images/right_extra.png">
+  </p>
 
-* and `outside`.
+* and outside.
 
   ```python
   with cms_figure.TDRStyle():
@@ -160,6 +168,8 @@ The other common positions are:
       canvas.Draw()
   ```
   
-  ![OutsideWithExtraText](images/outside_extra.png)
+  <p align="center">
+    <img width="350" height="350" src="images/outside_extra.png">
+  </p>
 
 **Under Construction**
