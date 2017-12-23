@@ -1,8 +1,6 @@
 # cms_figure
 
-The CMS Publication Committee (PubComm) has a set of [guidelines](https://twiki.cern.ch/twiki/bin/view/CMS/Internal/FigGuidelines) regarding how figures should appear in more official settings. To that end, they provide a ROOT C++ macro for drawing figure labels that is accompanied by an all too literal translation into Python. Both versions suffer from vague parameter names, unintuitive values for arguments, and minimal documentation.
-
-Having worked on restyling figures for publication, I decided to craft a more user-friendly experience for myself and others. The end result is this unofficial cms_figure package that features:
+The CMS Publication Committee (PubComm) has a set of [guidelines](https://twiki.cern.ch/twiki/bin/view/CMS/Internal/FigGuidelines) regarding how figures should appear in more official settings. To that end, they provide a ROOT C++ macro for drawing figure labels that is accompanied by an all too literal translation into Python. Having worked on restyling figures for publication, I decided to craft a more user-friendly experience. The end result is this unofficial cms_figure package that features:
 
 * A `TDRStyle` context manager that helps with switching to and from the official plotting style.
 * A `draw_labels` utility function that positions and draws figure labels on the active canvas.
@@ -47,13 +45,11 @@ The correct version number should appear in the terminal .
 
 ## Usage Examples
 
-In lieu of an API reference, I'll introduce the features of the package through Python snippets (which assume ROOT and cms_figure have been imported). All of the classes and functions have detailed docstrings, so you can pass them to the builtin `help` function in a Python interpreter.
+In lieu of an API reference, I'll introduce the features of the package through code snippets (which assume that ROOT and cms_figure have been imported). All of the classes and functions have detailed docstrings, so you can pass them to the builtin `help` function in a Python interpreter if you want to know more.
 
 ### 1. Plotting with the CMS Physics TDR Style
 
-The official plotting style for CMS figures is the physics technical design report (P-TDR) style. This is usually set by the `setTDRStyle` function provided by PubComm, which creates a `ROOT.TStyle` object with the correct style attributes and sets it as the global ROOT plotting style. However, the style object is never returned to the user, who may need to fiddle with only one or two style attributes to touch up their figures.
-
-The `TDRStyle` context manager provides a potentially more convenient way to set the plotting style. It is a subclass of `ROOT.TStyle` that can be invoked using a `with` statement:
+The official plotting style for CMS figures is the physics technical design report (P-TDR) style. The `TDRStyle` context manager provides a Pythonic way of setting the plotting style using `with` statements:
 
 ```python
 with cms_figure.TDRStyle():
@@ -73,6 +69,97 @@ with cms_figure.TDRStyle() as style:
     # Draw stuff here...
 ```
 
-As a subclass of `ROOT.TStyle`, the style attributes are be modified using the inherited "Set" methods [documentated](https://root.cern.ch/doc/master/classTStyle.html). I was thinking of turning the style attributes into Python properties, but didn't get to it yet. If you would like this feature, please bug me about it.
+As a subclass of `ROOT.TStyle`, the style attributes can be modified using the inherited "Set" methods documened [here](https://root.cern.ch/doc/master/classTStyle.html). I was thinking of turning the style attributes into Python properties, but didn't get to it yet. If you would like this feature, please bug me about it.
+
+### 2. Drawing the CMS and Luminosity Labels
+
+The official plotting style for CMS figures has specific requirements for displaying the CMS name, luminosity, and center-of-mass information. The `draw_labels` function takes care of all the relative positioning, font choices, and font sizes so the user needs only specifiy their preferred location and text for the labels.
+
+The `lumi_text` argument is the only required argument and sets the luminosity label's text without restriction, though the user is responsible for ensuring that it conforms to the PubComm standard. The `cms_position` argument sets the position of the CMS name on the canvas and also affects the relative positioning of any `extra_text` set by the user.
+
+The default behavior places the CMS name on the upper left corner inside the frame:
+
+```python
+with cms_figure.TDRStyle():
+    canvas = ROOT.TCanvas()
+    hist = ROOT.TH1F('normal', '', 50, -3, 3)
+    hist.FillRandom('gaus', 10000)
+    hist.Draw('hist')
+    cms_figure.draw_labels('19.0 fb^{-1} (8 TeV) + 5.0 fb^{-1} (7 TeV)')
+    canvas.Draw()
+```
+
+![Default](images/default.png)
+
+Let's add some additional writing to make it more interesting:
+
+```python
+with cms_figure.TDRStyle():
+    canvas = ROOT.TCanvas()
+    hist = ROOT.TH1F('normal', '', 50, -3, 3)
+    hist.FillRandom('gaus', 10000)
+    hist.Draw('hist')
+    cms_figure.draw_labels('19.0 fb^{-1} (8 TeV) + 5.0 fb^{-1} (7 TeV)', extra_text='Preliminary')
+    canvas.Draw()
+```
+
+![DefaultWithExtraText](images/default_extra.png)
+
+The other common positions are:
+
+* `center`,
+
+  ```python
+  with cms_figure.TDRStyle():
+      canvas = ROOT.TCanvas()
+      hist = ROOT.TH1F('normal', '', 50, -3, 3)
+      hist.FillRandom('gaus', 10000)
+      hist.SetMaximum(700)
+      hist.Draw('hist')
+      cms_figure.draw_labels(
+          lumi_text='19.0 fb^{-1} (8 TeV) + 5.0 fb^{-1} (7 TeV)',
+          cms_position='center',
+          extra_text='Preliminary',
+      )
+      canvas.Draw()
+  ```
+  
+  ![CenterWithExtraText](images/center_extra.png)
+
+* `right`,
+
+  ```python
+  with cms_figure.TDRStyle():
+      canvas = ROOT.TCanvas()
+      hist = ROOT.TH1F('normal', '', 50, -3, 3)
+      hist.FillRandom('gaus', 10000)
+      hist.Draw('hist')
+      cms_figure.draw_labels(
+          lumi_text='19.0 fb^{-1} (8 TeV) + 5.0 fb^{-1} (7 TeV)',
+          cms_position='right',
+          extra_text='Preliminary',
+      )
+      canvas.Draw()
+  ```
+  
+  ![RightWithExtraText](images/right_extra.png)
+
+* and `outside`.
+
+  ```python
+  with cms_figure.TDRStyle():
+      canvas = ROOT.TCanvas()
+      hist = ROOT.TH1F('normal', '', 50, -3, 3)
+      hist.FillRandom('gaus', 10000)
+      hist.Draw('hist')
+      cms_figure.draw_labels(
+          lumi_text='19.0 fb^{-1} (8 TeV) + 5.0 fb^{-1} (7 TeV)',
+          cms_position='outside',
+          extra_text='Preliminary',
+      )
+      canvas.Draw()
+  ```
+  
+  ![OutsideWithExtraText](images/outside_extra.png)
 
 **Under Construction**
